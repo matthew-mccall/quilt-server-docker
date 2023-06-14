@@ -1,5 +1,5 @@
 mods/
-world/datapacks/Terralith*
+world/datapacks/*
 
 # macOS
 .DS_Store
