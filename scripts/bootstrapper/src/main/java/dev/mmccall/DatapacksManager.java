@@ -1,6 +1,7 @@
 package dev.mmccall;
 
 import org.apache.commons.io.FileUtils;
+import org.apache.commons.io.FilenameUtils;
 import org.json.JSONObject;
 
 import java.io.File;
@@ -67,7 +68,7 @@ public class DatapacksManager {
 
         // Download zip into worldName/datapacks directory
         URL downloadURL = new URL(getDownloadURL(datapack, version));
-        FileUtils.copyURLToFile(downloadURL, new File(datapacksDirectory + "/" + datapack + ".zip"));
+        FileUtils.copyURLToFile(downloadURL, new File(datapacksDirectory, FilenameUtils.getName(downloadURL.getPath())));
     }
 
     private final HashMap<String, HashMap<String, String>> datapacks;
