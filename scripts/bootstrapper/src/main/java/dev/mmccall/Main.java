@@ -3,6 +3,8 @@ package dev.mmccall;
 import org.apache.commons.cli.*;
 
 import java.io.IOException;
+import java.util.Arrays;
+import java.util.HashSet;
 import java.util.Iterator;
 
 public class Main {
@@ -14,7 +16,7 @@ public class Main {
                 .argName("version")
                 .build();
 
-        Option modsToInstall = Option.builder("m")
+        Option modsToInstallOpt = Option.builder("m")
                 .longOpt("mods")
                 .desc("Mods to install")
                 .hasArgs()
@@ -22,7 +24,7 @@ public class Main {
                 .argName("mods")
                 .build();
 
-        Option dataPacksToInstall = Option.builder("d")
+        Option dataPacksToInstallOpt = Option.builder("d")
                 .longOpt("datapacks")
                 .desc("Datapacks to install")
                 .hasArgs()
@@ -50,8 +52,8 @@ public class Main {
         Options options = new Options();
 
         options.addOption(minecraftVersionOpt);
-        options.addOption(modsToInstall);
-        options.addOption(dataPacksToInstall);
+        options.addOption(modsToInstallOpt);
+        options.addOption(dataPacksToInstallOpt);
         options.addOption(dataParksWorldName);
         options.addOption(listSupportedDatapacks);
         options.addOption(printHelp);
@@ -93,31 +95,59 @@ public class Main {
             return;
         }
 
-        if (cmd.hasOption(dataPacksToInstall)) {
+        String minecraftVersion = cmd.getOptionValue(minecraftVersionOpt, "1.20");
+
+        if (cmd.hasOption(dataPacksToInstallOpt)) {
             DatapacksManager datapacksManager = new DatapacksManager("/datapacks.json");
             String worldName = cmd.getOptionValue(dataParksWorldName, "world");
             String[] datapacks = cmd.getOptionValues("datapacks");
 
-            for (String datapack : datapacks) {
+            HashSet<String> dataPacksToInstall = new HashSet<>(Arrays.asList(datapacks));
+            HashSet<String> failedDatapacks = new HashSet<>();
+
+            dataPacksToInstall.stream().parallel().forEach(datapack -> {
                 if (!datapacksManager.getDatapacks().contains(datapack)) {
                     System.err.println("Datapack " + datapack + " is not supported");
                     return;
                 }
-
-                String minecraftVersion = cmd.getOptionValue(minecraftVersionOpt, "1.20");
 
                 if (!datapacksManager.getAvailableVersions(datapack).contains(minecraftVersion)) {
                     System.err.printf("We don't have a version of %s for Minecraft %s%n", datapack, minecraftVersion);
                     return;
                 }
 
-                System.out.printf("Installing %s for Minecraft %s to %s%n", datapack, minecraftVersion, worldName);
-
                 try {
                     datapacksManager.installDatapack(datapack, minecraftVersion, worldName);
                 } catch (IOException e) {
-                    e.printStackTrace();
+                    failedDatapacks.add(datapack);
                 }
+            });
+
+            if (failedDatapacks.size() > 0) {
+                System.err.println("Failed to install the following datapacks:");
+                failedDatapacks.forEach(System.err::println);
+            }
+        }
+
+        if (cmd.hasOption(modsToInstallOpt)) {
+            String[] mods = cmd.getOptionValues(modsToInstallOpt);
+
+            HashSet<String> modsToInstall = new HashSet<>(Arrays.asList(mods));
+            HashSet<String> failedMods = new HashSet<>();
+
+            modsToInstall.stream().parallel().forEach(mod -> {
+                try {
+                    if (!ModDownloader.downloadMod(mod, minecraftVersion)) {
+                        failedMods.add(mod);
+                    }
+                } catch (IOException | InterruptedException e) {
+                    failedMods.add(mod);
+                }
+            });
+
+            if (failedMods.size() > 0) {
+                System.err.println("Failed to install the following mods:");
+                failedMods.forEach(System.err::println);
             }
         }
     }
