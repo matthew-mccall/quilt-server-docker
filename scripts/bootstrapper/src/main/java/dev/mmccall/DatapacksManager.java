@@ -6,9 +6,11 @@ import org.json.JSONObject;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
-import java.net.MalformedURLException;
 import java.net.URL;
-import java.util.*;
+import java.util.HashMap;
+import java.util.Objects;
+import java.util.Scanner;
+import java.util.Set;
 
 public class DatapacksManager {
     public DatapacksManager(String filename) {
@@ -24,6 +26,8 @@ public class DatapacksManager {
             while (scanner.hasNextLine()) {
                 datapacksJSON.append(scanner.nextLine());
             }
+
+            scanner.close();
         } catch (FileNotFoundException e) {
             e.printStackTrace();
             return;

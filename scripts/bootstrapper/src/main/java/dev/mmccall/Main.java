@@ -1,15 +1,9 @@
 package dev.mmccall;
 
 import org.apache.commons.cli.*;
-import org.json.JSONArray;
-import org.json.JSONObject;
 
-import java.io.File;
-import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.util.Iterator;
-import java.util.Objects;
-import java.util.Scanner;
 
 public class Main {
     public static void main(String[] args) {
@@ -58,6 +52,7 @@ public class Main {
         options.addOption(minecraftVersionOpt);
         options.addOption(modsToInstall);
         options.addOption(dataPacksToInstall);
+        options.addOption(dataParksWorldName);
         options.addOption(listSupportedDatapacks);
         options.addOption(printHelp);
 
@@ -71,13 +66,13 @@ public class Main {
             return;
         }
 
-        if (cmd.hasOption("help")) {
+        if (cmd.hasOption(printHelp)) {
             HelpFormatter formatter = new HelpFormatter();
             formatter.printHelp("bootstrapper", options);
             return;
         }
 
-        if (cmd.hasOption("listdatapacks")) {
+        if (cmd.hasOption(listSupportedDatapacks)) {
             System.out.println("Supported datapacks:");
             DatapacksManager datapacksManager = new DatapacksManager("/datapacks.json");
 
@@ -100,7 +95,7 @@ public class Main {
 
         if (cmd.hasOption(dataPacksToInstall)) {
             DatapacksManager datapacksManager = new DatapacksManager("/datapacks.json");
-            String worldName = cmd.getOptionValue("world", "world");
+            String worldName = cmd.getOptionValue(dataParksWorldName, "world");
             String[] datapacks = cmd.getOptionValues("datapacks");
 
             for (String datapack : datapacks) {
@@ -109,7 +104,7 @@ public class Main {
                     return;
                 }
 
-                String minecraftVersion = cmd.getOptionValue("mcversion", "1.20");
+                String minecraftVersion = cmd.getOptionValue(minecraftVersionOpt, "1.20");
 
                 if (!datapacksManager.getAvailableVersions(datapack).contains(minecraftVersion)) {
                     System.err.printf("We don't have a version of %s for Minecraft %s%n", datapack, minecraftVersion);
