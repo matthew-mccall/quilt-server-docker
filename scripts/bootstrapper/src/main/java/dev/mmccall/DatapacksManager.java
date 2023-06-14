@@ -20,7 +20,7 @@ public class DatapacksManager {
 
         try {
             // Get resource file
-            File datapacksFile = new File(Objects.requireNonNull(Main.class.getResource("/datapacks.json")).getFile());
+            File datapacksFile = new File(Objects.requireNonNull(Main.class.getResource(filename)).getFile());
             Scanner scanner = new Scanner(datapacksFile);
 
             while (scanner.hasNextLine()) {
