@@ -37,7 +37,7 @@ public class DatapacksManager {
         JSONObject datapacksObject = object.getJSONObject("datapacks");
 
         for (String datapackKey : datapacksObject.keySet()) {
-            datapacks.put(datapackKey, new HashMap<>());
+            datapacks.put(datapackKey.toLowerCase(), new HashMap<>());
             JSONObject datapack = datapacksObject.getJSONObject(datapackKey);
             for (String version : datapack.keySet()) {
                 datapacks.get(datapackKey).put(version, datapack.getString(version));

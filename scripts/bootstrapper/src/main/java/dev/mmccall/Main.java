@@ -106,7 +106,7 @@ public class Main {
             HashSet<String> failedDatapacks = new HashSet<>();
 
             dataPacksToInstall.stream().parallel().forEach(datapack -> {
-                if (!datapacksManager.getDatapacks().contains(datapack)) {
+                if (!datapacksManager.getDatapacks().contains(datapack.toLowerCase())) {
                     System.err.println("Datapack " + datapack + " is not supported");
                     return;
                 }
@@ -137,7 +137,7 @@ public class Main {
 
             modsToInstall.stream().parallel().forEach(mod -> {
                 try {
-                    if (!ModDownloader.downloadMod(mod, minecraftVersion)) {
+                    if (!ModDownloader.downloadMod(mod.toLowerCase(), minecraftVersion)) {
                         failedMods.add(mod);
                     }
                 } catch (IOException | InterruptedException e) {
