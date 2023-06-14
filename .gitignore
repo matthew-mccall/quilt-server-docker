@@ -1,0 +1,5 @@
+mods/
+world/datapacks/Terralith*
+
+# macOS
+.DS_Store
