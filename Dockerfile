@@ -1,12 +1,12 @@
 # syntax=docker/dockerfile:1
 
-FROM eclipse-temurin:17-alpine AS installer
+FROM gradle AS installer
 
 ARG MINECRAFT_VERSION=1.20
 ARG MODS=ferrite-core,starlight,krypton,alternate-current,lithium,c2me-fabric,carpet
 ARG DATAPACKS=""
 
-RUN apk --no-cache add curl
+RUN apt-get update && apt-get install -y curl
 
 WORKDIR /install
 
