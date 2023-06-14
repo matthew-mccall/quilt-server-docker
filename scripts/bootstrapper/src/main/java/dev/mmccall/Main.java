@@ -20,6 +20,7 @@ public class Main {
                 .longOpt("mods")
                 .desc("Mods to install")
                 .hasArgs()
+                .optionalArg(true)
                 .valueSeparator(',')
                 .argName("mods")
                 .build();
@@ -28,6 +29,7 @@ public class Main {
                 .longOpt("datapacks")
                 .desc("Datapacks to install")
                 .hasArgs()
+                .optionalArg(true)
                 .valueSeparator(',')
                 .argName("datapacks")
                 .build();
@@ -44,6 +46,13 @@ public class Main {
                 .desc("List supported datapacks")
                 .build();
 
+        Option serverRootOpt = Option.builder("r")
+                .longOpt("server-root")
+                .desc("Server root directory (default: .)")
+                .hasArg()
+                .argName("directory")
+                .build();
+
         Option printHelp = Option.builder("h")
                 .longOpt("help")
                 .desc("Print help")
@@ -56,6 +65,7 @@ public class Main {
         options.addOption(dataPacksToInstallOpt);
         options.addOption(dataParksWorldName);
         options.addOption(listSupportedDatapacks);
+        options.addOption(serverRootOpt);
         options.addOption(printHelp);
 
         CommandLineParser parser = new DefaultParser();
@@ -65,6 +75,7 @@ public class Main {
             cmd = parser.parse(options, args);
         } catch (ParseException e) {
             System.err.println(e.getMessage());
+            System.exit(1);
             return;
         }
 
@@ -96,11 +107,12 @@ public class Main {
         }
 
         String minecraftVersion = cmd.getOptionValue(minecraftVersionOpt, "1.20");
+        String serverRoot = cmd.getOptionValue(serverRootOpt, System.getProperty("user.dir"));
 
-        if (cmd.hasOption(dataPacksToInstallOpt)) {
+        if (cmd.hasOption(dataPacksToInstallOpt) && (cmd.getOptionValues(dataPacksToInstallOpt) != null)) {
             DatapacksManager datapacksManager = new DatapacksManager("/datapacks.json");
             String worldName = cmd.getOptionValue(dataParksWorldName, "world");
-            String[] datapacks = cmd.getOptionValues("datapacks");
+            String[] datapacks = cmd.getOptionValues(dataPacksToInstallOpt);
 
             HashSet<String> dataPacksToInstall = new HashSet<>(Arrays.asList(datapacks));
             HashSet<String> failedDatapacks = new HashSet<>();
@@ -117,7 +129,7 @@ public class Main {
                 }
 
                 try {
-                    datapacksManager.installDatapack(datapack, minecraftVersion, worldName);
+                    datapacksManager.installDatapack(datapack, minecraftVersion, worldName, serverRoot);
                 } catch (IOException e) {
                     failedDatapacks.add(datapack);
                 }
@@ -129,7 +141,7 @@ public class Main {
             }
         }
 
-        if (cmd.hasOption(modsToInstallOpt)) {
+        if (cmd.hasOption(modsToInstallOpt) && (cmd.getOptionValues(modsToInstallOpt) != null)) {
             String[] mods = cmd.getOptionValues(modsToInstallOpt);
 
             HashSet<String> modsToInstall = new HashSet<>(Arrays.asList(mods));
@@ -137,7 +149,7 @@ public class Main {
 
             modsToInstall.stream().parallel().forEach(mod -> {
                 try {
-                    if (!ModDownloader.downloadMod(mod.toLowerCase(), minecraftVersion)) {
+                    if (!ModDownloader.downloadMod(mod.toLowerCase(), minecraftVersion, serverRoot)) {
                         failedMods.add(mod);
                     }
                 } catch (IOException | InterruptedException e) {

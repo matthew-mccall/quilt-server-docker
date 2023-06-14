@@ -60,9 +60,9 @@ public class DatapacksManager {
         return datapacks.get(datapack).get(version);
     }
 
-    public void installDatapack(String datapack, String version, String worldName) throws IOException {
+    public void installDatapack(String datapack, String version, String worldName, String serverRoot) throws IOException {
         // Create worldName/datapacks directory if it doesn't exist using Commons IO
-        File datapacksDirectory = new File(worldName + "/datapacks");
+        File datapacksDirectory = new File(String.format("%s/%s/datapacks", serverRoot, worldName));
         FileUtils.forceMkdir(datapacksDirectory);
 
         // Download zip into worldName/datapacks directory

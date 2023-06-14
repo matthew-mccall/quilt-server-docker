@@ -15,7 +15,7 @@ import java.net.http.HttpRequest;
 import java.net.http.HttpResponse;
 
 public class ModDownloader {
-    static boolean downloadMod(String modName, String minecraftVersion) throws IOException, InterruptedException {
+    static boolean downloadMod(String modName, String minecraftVersion, String serverRoot) throws IOException, InterruptedException {
 
         URI uri;
 
@@ -65,7 +65,7 @@ public class ModDownloader {
             primaryFile = files.getJSONObject(0);
         }
 
-        File modsFolder = new File("mods");
+        File modsFolder = new File(serverRoot, "mods");
         FileUtils.forceMkdir(modsFolder);
 
         File modFile = new File(modsFolder, primaryFile.getString("filename"));
