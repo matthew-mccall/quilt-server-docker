@@ -29,6 +29,7 @@ COPY --from=installer /install/mods ./mods
 COPY --from=installer /install/libraries ./libraries
 COPY --from=installer /install/*.jar ./
 
+COPY ./eula.txt .
 COPY ./server.properties .
 COPY ./scripts/launch.sh ./scripts/launch.sh
 
