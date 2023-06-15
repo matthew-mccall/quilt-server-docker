@@ -2,10 +2,6 @@
 
 FROM gradle AS installer
 
-ARG MINECRAFT_VERSION=1.20
-ARG MODS=ferrite-core,starlight,krypton,alternate-current,lithium,c2me-fabric,carpet
-ARG DATAPACKS=""
-
 RUN apt-get update && apt-get install -y curl
 
 WORKDIR /install
@@ -13,6 +9,10 @@ WORKDIR /install
 COPY . .
 
 RUN mkdir -p mods/
+
+ARG MINECRAFT_VERSION=1.20
+ARG MODS=ferrite-core,starlight,krypton,alternate-current,lithium,c2me-fabric,carpet
+ARG DATAPACKS=""
 
 RUN ./scripts/installModsAndDataPacks.sh \
 --minecraft-version ${MINECRAFT_VERSION} \
